@@ -5,22 +5,16 @@ current_dir="$base_dir"
 
 
 archive_downloader(){
-	notify-send "triggered archive_downloader"
 	url=$1
 	name=$2
 	save_location=$3
 	response=$(curl -sI "https://web.archive.org/save/$url")
 	echo "$response" >> $HOME/.dotfiles/scripts/log.txt
 	echo "-------------------------------" >> $HOME/.dotfiles/scripts/log.txt
-	notify-send "got a response"
 	archive_url=$(echo "$response" | grep '^location:' | tail -c +11 | tr -d '\r')
-	echo "$archive_url" >> $HOME/.dotfiles/scripts/log.txt
-	echo "-------------------------------" >> $HOME/.dotfiles/scripts/log.txt
-	notify-send "archive_url $archive_url"
 	webpage=$(curl "$archive_url")
 	img_archive_src=$(echo "$webpage" | grep "main-product-image" | sed -n 's/.*data-src-zoom-image="\([^"]*\)".*/\1/p')
 	img_org_src=$(echo "$img_archive_src" | sed 's|https://web.archive.org/.*\(https://i.etsystatic.com/.*\)|\1|')
-	notify-send "img_org_src $img_org_src"
 	img_ext="${img_org_src##*.}"
 
 	
