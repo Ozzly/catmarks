@@ -9,22 +9,29 @@ archive_downloader(){
 	name=$2
 	save_location=$3
 	response=$(curl -sI "https://web.archive.org/save/$url")
-	echo "$response" >> $HOME/.dotfiles/scripts/log.txt
-	echo "-------------------------------" >> $HOME/.dotfiles/scripts/log.txt
-	archive_url=$(echo "$response" | grep '^location:' | tail -c +11 | tr -d '\r')
-	webpage=$(curl "$archive_url")
-	img_archive_src=$(echo "$webpage" | grep "main-product-image" | sed -n 's/.*data-src-zoom-image="\([^"]*\)".*/\1/p')
-	img_org_src=$(echo "$img_archive_src" | sed 's|https://web.archive.org/.*\(https://i.etsystatic.com/.*\)|\1|')
-	img_ext="${img_org_src##*.}"
 
-	
-	curl "$img_org_src" -o "$save_location/$name.$img_ext"
-	
-	if [[ "$img_ext" != "png" ]] && [[ "$img_ext" != "jpg" ]]; then
-		magick "$save_location/$name.$img_ext" "$save_location/$name.png"
-		notify-send "Image wasn't a png or jpg, might need to be converted?"
-	else
-		notify-send "image was a png or jpg, doing nothing extra"
+	echo "$response" >> log.txt
+	echo "-------------------------------" >> log.txt
+
+	response_status=$(echo "$response" | grep 'HTTP/2' | tail -c +8 | tr -d '\r')
+	if [ "$response_status" -eq 302 ]; then # Successfull archive response
+
+		# Obtain original image URL
+		archive_url=$(echo "$response" | grep '^location:' | tail -c +11 | tr -d '\r')
+		webpage=$(curl "$archive_url")
+		img_archive_src=$(echo "$webpage" | grep "main-product-image" | sed -n 's/.*data-src-zoom-image="\([^"]*\)".*/\1/p')
+		img_org_src=$(echo "$img_archive_src" | sed 's|https://web.archive.org/.*\(https://i.etsystatic.com/.*\)|\1|')
+		img_ext="${img_org_src##*.}"
+
+		curl "$img_org_src" -o "$save_location/$name.$img_ext"
+
+		# Convert image format if needed	
+		if [[ "$img_ext" != "png" ]] && [[ "$img_ext" != "jpg" ]]; then
+			magick "$save_location/$name.$img_ext" "$save_location/$name.png"
+		fi
+
+	else # Failed to archive page
+		notify-send "Bad response from archive.org"
 	fi
 }
 
