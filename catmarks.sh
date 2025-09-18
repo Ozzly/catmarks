@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-base_dir="$HOME/catmarks"
+base_dir="$HOME/catmarks2"
 current_dir="$base_dir"
 
 
@@ -35,6 +35,10 @@ archive_downloader(){
 	fi
 }
 
+
+if [ ! -d "$base_dir" ]; then
+	mkdir "$base_dir"
+fi
 
 
 while true; do
