@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-base_dir="$HOME/catmarks2"
+base_dir="$HOME/catmarks"
 current_dir="$base_dir"
 
 
@@ -42,19 +42,15 @@ fi
 
 
 while true; do
-
 	
 
-
-
 	files=($(ls -a "$current_dir"))
-	text_with_icons=""
+	text_with_icons="Add New\0icon\x1f$base_dir/plus_icon.png\n"
 
 	inarray=$(echo ${files[@]} | grep -ow "rofi_theme.rasi" | wc -w)
 	[ "$inarray" -eq 1 ] && ROFI_THEME="custom" || ROFI_THEME="system"
 
 
-	#selection=$(ls "$current_dir" | rofi -dmenu -kb-custom-1 "Alt+a" -theme ./icon-theme.rasi -show-icons)
 	for file in "$current_dir"/*; do
 		[ -e "$file" ] || continue
 		if [ -d "$file" ] || [[ "$file" == *.txt ]]; then
@@ -71,9 +67,7 @@ while true; do
 		
 	done
 	
-	# [ "$base_dir" != "$current_dir" ] && text_with_icons+="Return" 
-	# text_with_icons+="New Entry\0icon\x1fthumbnail://$HOME/catmarks/catppuccin--folder.png\n"
-	# text_with_icons+="New Group\n"
+	text_with_icons+="Create New Category\0icon\x1f$base_dir/add_directory.png"
 
 
 	if [[ "$ROFI_THEME" == "system" ]]; then
