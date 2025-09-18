@@ -83,7 +83,19 @@ while true; do
 
 	# Opening an entry (Pressing Enter)
 	elif [ "$exit_code" -eq 0 ]; then
-		[ "$selection" == "Return" ] && current_dir=$(dirname "$current_dir") || current_dir="$current_dir/$selection"
+		if [ "$selection" == "Add New" ]; then
+			# Add new logic
+
+		elif [ "$selection" == "Create New Category" ]; then
+			# Create new category logic
+
+		elif [ -d "$current_dir/$selection" ]; then
+			# Open directory logic
+			current_dir="$current_dir/$selection"
+
+		else
+			# Else logic - should be the item itself
+		fi
 
 	# Adding a new item entry
 	elif [ "$exit_code" -eq 10 ]; then # Will cause problems as can't properly quit halfway through
