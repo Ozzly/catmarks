@@ -84,8 +84,15 @@ while true; do
 	# Opening an entry (Pressing Enter)
 	elif [ "$exit_code" -eq 0 ]; then
 		if [ "$selection" == "Add New" ]; then
-			# Add new logic
-			break;
+			# Add new item
+			new_bookmark_url=$(rofi -dmenu -p "Enter bookmark URL")
+			new_bookmark_name=$(rofi -dmenu -p "Enter bookmark Name")
+			if [ -n "$new_bookmark_url" ] && [ -n "$new_bookmark_name" ]; then
+				archive_downloader "$new_bookmark_url" "$new_bookmark_name" "$current_dir" &
+				echo "$new_bookmark_url" >> "$current_dir/$new_bookmark_name.txt"
+			else
+				notify-send "Input fields left blank"
+			fi
 
 		elif [ "$selection" == "Create New Category" ]; then
 			# Create new category (directory)
