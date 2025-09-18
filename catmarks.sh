@@ -114,19 +114,5 @@ while true; do
 			xdg-open $(cat "$current_dir/$selection.txt")
 			break;
 		fi
-
-	# Adding a new item entry
-	elif [ "$exit_code" -eq 10 ]; then # Will cause problems as can't properly quit halfway through
-		new_url=$(rofi -dmenu -p "Enter the URL")
-		new_name=$(rofi -dmenu -p "Enter the Name")
-		archive_downloader "$new_url" "$new_name" "$current_dir" &
-		echo "$new_url" >> "$current_dir/$new_name.txt"
-
-	elif [ "$exit_code" -eq 11 ]; then
-		new_dir=$(rofi -dmenu -p "Enter the category name")
-		mkdir "$current_dir/$new_dir"
-		current_dir="$current_dir/$new_dir"
-
 	fi
-
 done
