@@ -85,16 +85,27 @@ while true; do
 	elif [ "$exit_code" -eq 0 ]; then
 		if [ "$selection" == "Add New" ]; then
 			# Add new logic
+			break;
 
 		elif [ "$selection" == "Create New Category" ]; then
-			# Create new category logic
+			# Create new category (directory)
+			new_category_name=$(rofi -dmenu -p "New Category Name")
+			new_category_path="$current_dir/$new_category_name"
+			if [ -n "$new_category_name" ] && [ ! -d "$new_category_path" ]; then
+				mkdir "$new_category_path"
+				current_dir="$new_category_path"
+			else
+				notify-send "Failed to create new category"
+			fi
 
 		elif [ -d "$current_dir/$selection" ]; then
-			# Open directory logic
+			# Open selected directory
 			current_dir="$current_dir/$selection"
 
-		else
-			# Else logic - should be the item itself
+		else 
+			# Open bookmark in the default browser
+			xdg-open $(cat "$current_dir/$selection.txt")
+			break;
 		fi
 
 	# Adding a new item entry
