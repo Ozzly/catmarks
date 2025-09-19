@@ -4,47 +4,52 @@ base_dir="$HOME/catmarks"
 current_dir="$base_dir"
 
 
-archive_downloader(){
+image_downloader(){
 	url=$1
 	name=$2
 	save_location=$3
-	response=$(curl -sI "https://web.archive.org/save/$url")
 
-	echo "$response" >> log.txt
-	echo "-------------------------------" >> log.txt
+	# Youtube doesn't require the bypass method to download thumbnails
+	if [[ "$url" == *"youtube.com"* ]]; then
+		video_id=$(echo "$url" | sed -nE 's#.*(v=|youtu\.be/)([A-Za-z0-9_-]{11}).*#\2#p') # Sed expression generated with AI, don't ask me
+		curl "i.ytimg.com/vi/$video_id/maxresdefault.jpg" -o "$save_location/$name.jpg"
 
-	response_status=$(echo "$response" | grep 'HTTP/2' | tail -c +8 | tr -d '\r')
-	if [ "$response_status" -eq 302 ]; then # Successfull archive response
+	else # Use the internet archive to bypass bot restrictions on websites
+		response=$(curl -sI "https://web.archive.org/save/$url")
 
-		# Obtain original image URL
-		archive_url=$(echo "$response" | grep '^location:' | tail -c +11 | tr -d '\r')
-		webpage=$(curl "$archive_url")
-		if [[ "$url" == *"youtube.com"* ]]; then 
-			break;
+		response_status=$(echo "$response" | grep 'HTTP/2' | tail -c +8 | tr -d '\r')
+		if [ "$response_status" -eq 302 ]; then # Successfull archive response
 
-		elif [[ "$url" == *"etsy.co.uk"* || "$url" == *"etsy.com"* ]]; then
-			img_archive_src=$(echo "$webpage" | grep "main-product-image" | sed -n 's/.*data-src-zoom-image="\([^"]*\)".*/\1/p')
-			img_org_src=$(echo "$img_archive_src" | sed 's|https://web.archive.org/.*\(https://i.etsystatic.com/.*\)|\1|')
-			img_ext="${img_org_src##*.}"
-
-		elif [[ "$url" == *"ebay.co.uk"* || "$url" == *"ebay.com"* ]]; then
-			break;
+			# Obtain original image URL
+			archive_url=$(echo "$response" | grep '^location:' | tail -c +11 | tr -d '\r')
+			webpage=$(curl "$archive_url")
 			
-		else
-			notify-send "Website not yet supported"
-			break;
-		fi
-		
-		# Download image
-		curl "$img_org_src" -o "$save_location/$name.$img_ext"
-		# Convert image format if needed	
-		if [[ "$img_ext" != "png" ]] && [[ "$img_ext" != "jpg" ]]; then
-			magick "$save_location/$name.$img_ext" "$save_location/$name.png"
+			if [[ "$url" == *"etsy.co.uk"* || "$url" == *"etsy.com"* ]]; then
+				img_archive_src=$(echo "$webpage" | grep "main-product-image" | sed -n 's/.*data-src-zoom-image="\([^"]*\)".*/\1/p')
+				img_org_src=$(echo "$img_archive_src" | sed 's|https://web.archive.org/.*\(https://i.etsystatic.com/.*\)|\1|')
+				img_ext="${img_org_src##*.}"
+
+			elif [[ "$url" == *"ebay.co.uk"* || "$url" == *"ebay.com"* ]]; then
+				break
+				
+			else
+				notify-send "Website not yet supported"
+				break
+			fi
+			
+			# Download image
+			curl "$img_org_src" -o "$save_location/$name.$img_ext"
+			# Convert image format if needed	
+			if [[ "$img_ext" != "png" ]] && [[ "$img_ext" != "jpg" ]]; then
+				magick "$save_location/$name.$img_ext" "$save_location/$name.png"
+			fi
+
+		else # Failed to archive page
+			notify-send "Bad response from archive.org"
 		fi
 
-	else # Failed to archive page
-		notify-send "Bad response from archive.org"
 	fi
+
 }
 
 
@@ -100,11 +105,12 @@ while true; do
 			new_bookmark_url=$(rofi -dmenu -p "Enter bookmark URL")
 			new_bookmark_name=$(rofi -dmenu -p "Enter bookmark Name")
 			if [ -n "$new_bookmark_url" ] && [ -n "$new_bookmark_name" ]; then
-				archive_downloader "$new_bookmark_url" "$new_bookmark_name" "$current_dir" &
+				image_downloader "$new_bookmark_url" "$new_bookmark_name" "$current_dir" &
 				echo "$new_bookmark_url" >> "$current_dir/$new_bookmark_name.txt"
 			else
 				notify-send "Input fields left blank"
 			fi
+			break
 
 		elif [ "$selection" == "Create New Category" ]; then
 			# Create new category (directory)
