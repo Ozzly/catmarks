@@ -19,12 +19,24 @@ archive_downloader(){
 		# Obtain original image URL
 		archive_url=$(echo "$response" | grep '^location:' | tail -c +11 | tr -d '\r')
 		webpage=$(curl "$archive_url")
-		img_archive_src=$(echo "$webpage" | grep "main-product-image" | sed -n 's/.*data-src-zoom-image="\([^"]*\)".*/\1/p')
-		img_org_src=$(echo "$img_archive_src" | sed 's|https://web.archive.org/.*\(https://i.etsystatic.com/.*\)|\1|')
-		img_ext="${img_org_src##*.}"
+		if [[ "$url" == *"youtube.com"* ]]; then 
+			break;
 
+		elif [[ "$url" == *"etsy.co.uk"* || "$url" == *"etsy.com"* ]]; then
+			img_archive_src=$(echo "$webpage" | grep "main-product-image" | sed -n 's/.*data-src-zoom-image="\([^"]*\)".*/\1/p')
+			img_org_src=$(echo "$img_archive_src" | sed 's|https://web.archive.org/.*\(https://i.etsystatic.com/.*\)|\1|')
+			img_ext="${img_org_src##*.}"
+
+		elif [[ "$url" == *"ebay.co.uk"* || "$url" == *"ebay.com"* ]]; then
+			break;
+			
+		else
+			notify-send "Website not yet supported"
+			break;
+		fi
+		
+		# Download image
 		curl "$img_org_src" -o "$save_location/$name.$img_ext"
-
 		# Convert image format if needed	
 		if [[ "$img_ext" != "png" ]] && [[ "$img_ext" != "jpg" ]]; then
 			magick "$save_location/$name.$img_ext" "$save_location/$name.png"
