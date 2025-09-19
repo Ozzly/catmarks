@@ -36,23 +36,22 @@ archive_downloader(){
 }
 
 
+# Create base directory if nonexistent
 if [ ! -d "$base_dir" ]; then
 	mkdir "$base_dir"
 fi
 
 
 while true; do
-	
-	text_with_icons="Add New\0icon\x1f$base_dir/plus_icon.png\n"
-	
-
+	# Determine if a custom rofi theme exists in the directory
 	if find "$current_dir" -maxdepth 1 -name "rofi_theme.rasi" -print -quit | grep -q .; then
     		ROFI_THEME="custom"
 	else
     		ROFI_THEME="system"
 	fi
 
-
+        # Generate the input to rofi (with thumbnails)
+	text_with_icons="Add New\0icon\x1f$base_dir/plus_icon.png\n"
 	for file in "$current_dir"/*; do
 		[ -e "$file" ] || continue
 		if [ -d "$file" ] || [[ "$file" == *.txt ]]; then
@@ -66,16 +65,15 @@ while true; do
 				text_with_icons+="$name\n"
 			fi
 		fi
-		
 	done
-	
 	text_with_icons+="Create New Category\0icon\x1f$base_dir/add_directory.png"
 
 
+	# Display Rofi prompt based on provided theme
 	if [[ "$ROFI_THEME" == "system" ]]; then
-		selection=$(echo -en "$text_with_icons" | rofi -dmenu -kb-custom-1 "Alt+a" -kb-custom-2 "Alt+d")
+		selection=$(echo -en "$text_with_icons" | rofi -dmenu )
 	else
-		selection=$(echo -en "$text_with_icons" | rofi -dmenu -show-icons -kb-custom-1 "Alt+a" -kb-custom-2 "Alt+d" -theme "$current_dir/rofi_theme.rasi")
+		selection=$(echo -en "$text_with_icons" | rofi -dmenu -show-icons -theme "$current_dir/rofi_theme.rasi")
 	fi
 	exit_code=$?
 
@@ -83,7 +81,7 @@ while true; do
 	if [ "$exit_code" -eq 1 ]; then
 		break
 
-	# Opening an entry (Pressing Enter)
+	# Select entry
 	elif [ "$exit_code" -eq 0 ]; then
 		if [ "$selection" == "Add New" ]; then
 			# Add new item
