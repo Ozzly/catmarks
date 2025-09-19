@@ -43,12 +43,14 @@ fi
 
 while true; do
 	
-
-	files=($(ls -a "$current_dir"))
 	text_with_icons="Add New\0icon\x1f$base_dir/plus_icon.png\n"
+	
 
-	inarray=$(echo ${files[@]} | grep -ow "rofi_theme.rasi" | wc -w)
-	[ "$inarray" -eq 1 ] && ROFI_THEME="custom" || ROFI_THEME="system"
+	if find "$current_dir" -maxdepth 1 -name "rofi_theme.rasi" -print -quit | grep -q .; then
+    		ROFI_THEME="custom"
+	else
+    		ROFI_THEME="system"
+	fi
 
 
 	for file in "$current_dir"/*; do
