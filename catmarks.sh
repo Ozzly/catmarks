@@ -1,7 +1,19 @@
 #!/usr/bin/env bash
 
+shopt -s globstar nullglob
+
 base_dir="$HOME/catmarks"
 current_dir="$base_dir"
+auto_download_thumbnails=1
+custom_rofi_path="" # If set will override system rofi in all directories
+
+while [[ $# -gt 0 ]]; do
+        case $1 in
+                --base-directory | -b) base_dir="$2"; shift 2 ;;
+                --disable-download-thumbnails | -d) auto_download_thumbnails=0; shift ;;
+                --custom-rofi-path | -r) custom_rofi_path="$2"; shift 2 ;;
+        esac
+done
 
 
 image_downloader(){
