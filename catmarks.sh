@@ -117,7 +117,7 @@ while true; do
 			new_bookmark_url=$(rofi -dmenu -p "Enter bookmark URL")
 			new_bookmark_name=$(rofi -dmenu -p "Enter bookmark Name")
 			if [ -n "$new_bookmark_url" ] && [ -n "$new_bookmark_name" ]; then
-				image_downloader "$new_bookmark_url" "$new_bookmark_name" "$current_dir" &
+                                [[ "$auto_download_thumbnails" -eq 1 ]] && image_downloader "$new_bookmark_url" "$new_bookmark_name" "$current_dir" &
 				echo "$new_bookmark_url" >> "$current_dir/$new_bookmark_name.txt"
 			else
 				notify-send "Input fields left blank"
