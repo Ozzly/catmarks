@@ -6,6 +6,7 @@ base_dir="$HOME/catmarks"
 current_dir="$base_dir"
 auto_download_thumbnails=1
 rofi_new_bookmark_option=1
+rofi_new_category_option=1
 
 while [[ $# -gt 0 ]]; do
         case $1 in
@@ -13,6 +14,7 @@ while [[ $# -gt 0 ]]; do
                 --disable-download-thumbnails | -d) auto_download_thumbnails=0; shift ;;
                 --custom-rofi-path | -r) custom_rofi_path="$2"; shift 2 ;;
                 --disable-rofi-new-bookmark-option | -n) rofi_new_bookmark_option=0; shift ;;
+                --disable-rofi-new-category-option | -c) rofi_new_category_option=0; shift ;;
         esac
 done
 
@@ -86,6 +88,7 @@ while true; do
 
         # Generate the input to rofi (with thumbnails)
         [[ "$rofi_new_bookmark_option" == 1 ]] && text_with_icons+="New Bookmark\0icon\x1f$base_dir/plus_icon.png\n"
+
 	for file in "$current_dir"/*; do
 		[ -e "$file" ] || continue
 		if [ -d "$file" ] || [[ "$file" == *.txt ]]; then
@@ -100,7 +103,8 @@ while true; do
 			fi
 		fi
 	done
-	text_with_icons+="Create New Category\0icon\x1f$base_dir/add_directory.png"
+
+	[[ "$rofi_new_category_option" == 1 ]] && text_with_icons+="Create New Category\0icon\x1f$base_dir/add_directory.png"
 
 
 	# Display rofi prompt, get exit code for keybind responses
