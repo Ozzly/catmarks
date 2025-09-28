@@ -5,13 +5,14 @@ shopt -s globstar nullglob
 base_dir="$HOME/catmarks"
 current_dir="$base_dir"
 auto_download_thumbnails=1
-
+rofi_new_bookmark_option=1
 
 while [[ $# -gt 0 ]]; do
         case $1 in
                 --base-directory | -b) base_dir="$2"; shift 2 ;;
                 --disable-download-thumbnails | -d) auto_download_thumbnails=0; shift ;;
                 --custom-rofi-path | -r) custom_rofi_path="$2"; shift 2 ;;
+                --disable-rofi-new-bookmark-option | -n) rofi_new_bookmark_option=0; shift ;;
         esac
 done
 
@@ -73,6 +74,7 @@ fi
 
 while true; do
         rofi_cmd=(rofi -dmenu)
+        text_with_icons=""
 
         # Building the rofi command based on theme settings
         if [[ -n "$custom_rofi_path" && -f "$custom_rofi_path" ]]; then
@@ -83,7 +85,7 @@ while true; do
         fi
 
         # Generate the input to rofi (with thumbnails)
-	text_with_icons="Add New\0icon\x1f$base_dir/plus_icon.png\n"
+        [[ "$rofi_new_bookmark_option" == 1 ]] && text_with_icons+="New Bookmark\0icon\x1f$base_dir/plus_icon.png\n"
 	for file in "$current_dir"/*; do
 		[ -e "$file" ] || continue
 		if [ -d "$file" ] || [[ "$file" == *.txt ]]; then
@@ -111,7 +113,7 @@ while true; do
 
 	# Select entry
 	elif [ "$exit_code" -eq 0 ]; then
-		if [ "$selection" == "Add New" ]; then
+		if [ "$selection" == "New Bookmark" ]; then
 			# Add new item
 			new_bookmark_url=$(rofi -dmenu -p "Enter bookmark URL")
 			new_bookmark_name=$(rofi -dmenu -p "Enter bookmark Name")
