@@ -5,7 +5,7 @@ shopt -s globstar nullglob
 base_dir="$HOME/catmarks"
 current_dir="$base_dir"
 auto_download_thumbnails=1
-custom_rofi_path="" # If set will override system rofi in all directories
+
 
 while [[ $# -gt 0 ]]; do
         case $1 in
@@ -72,12 +72,15 @@ fi
 
 
 while true; do
-	# Determine if a custom rofi theme exists in the directory
-	if find "$current_dir" -maxdepth 1 -name "rofi_theme.rasi" -print -quit | grep -q .; then
-    		ROFI_THEME="custom"
-	else
-    		ROFI_THEME="system"
-	fi
+        rofi_cmd=(rofi -dmenu)
+
+        # Building the rofi command based on theme settings
+        if [[ -n "$custom_rofi_path" && -f "$custom_rofi_path" ]]; then
+                rofi_cmd+=(-theme "$custom_rofi_path")
+
+	elif find "$current_dir" -maxdepth 1 -name "rofi_theme.rasi" -print -quit | grep -q .; then
+                rofi_cmd+=(-show-icons -theme "$current_dir/rofi_theme.rasi")
+        fi
 
         # Generate the input to rofi (with thumbnails)
 	text_with_icons="Add New\0icon\x1f$base_dir/plus_icon.png\n"
@@ -98,12 +101,8 @@ while true; do
 	text_with_icons+="Create New Category\0icon\x1f$base_dir/add_directory.png"
 
 
-	# Display Rofi prompt based on provided theme
-	if [[ "$ROFI_THEME" == "system" ]]; then
-		selection=$(echo -en "$text_with_icons" | rofi -dmenu )
-	else
-		selection=$(echo -en "$text_with_icons" | rofi -dmenu -show-icons -theme "$current_dir/rofi_theme.rasi")
-	fi
+	# Display rofi prompt, get exit code for keybind responses
+        selection=$(echo -en "$text_with_icons" | "${rofi_cmd[@]}" )
 	exit_code=$?
 
 	# Exit the script
