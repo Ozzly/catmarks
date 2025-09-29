@@ -30,6 +30,7 @@ image_downloader(){
 		curl "i.ytimg.com/vi/$video_id/maxresdefault.jpg" -o "$save_location/$name.jpg"
 
 	else # Use the internet archive to bypass bot restrictions on websites
+                echo "waiting for response"
 		response=$(curl -sI "https://web.archive.org/save/$url")
 
 		response_status=$(echo "$response" | grep 'HTTP/2' | tail -c +8 | tr -d '\r')
@@ -37,15 +38,17 @@ image_downloader(){
 
 			# Obtain original image URL
 			archive_url=$(echo "$response" | grep '^location:' | tail -c +11 | tr -d '\r')
+                        echo "$archive_url"
 			webpage=$(curl "$archive_url")
 			
 			if [[ "$url" == *"etsy.com"* ]]; then
 				img_archive_src=$(echo "$webpage" | grep "main-product-image" | sed -n 's/.*data-src-zoom-image="\([^"]*\)".*/\1/p')
-				img_org_src=$(echo "$img_archive_src" | sed 's|https://web.archive.org/.*\(https://i.etsystatic.com/.*\)|\1|')
-				img_ext="${img_org_src##*.}"
+				img_src=$(echo "$img_archive_src" | sed 's|https://web.archive.org/.*\(https://i.etsystatic.com/.*\)|\1|')
+				img_ext="${img_src##*.}"
 
-			elif [[ "$url" == *"ebay.co.uk"* || "$url" == *"ebay.com"* ]]; then
-				break
+			elif [[ "$url" == *"ebay.co.uk"* ]]; then
+                                img_src=$(echo "$webpage" | grep "window.heroImg =" | sed -E 's|.*"(https://web.archive.org/.*/(https://i\.ebayimg\.com[^"]+))".*|\2|') # Also AI regex for sed
+				img_ext="${img_src##*.}"
 				
 			else
 				notify-send "Website not yet supported"
@@ -53,7 +56,7 @@ image_downloader(){
 			fi
 			
 			# Download image
-			curl "$img_org_src" -o "$save_location/$name.$img_ext"
+			curl "$img_src" -o "$save_location/$name.$img_ext"
 			# Convert image format if needed	
 			if [[ -n "$img_ext" ]] && [[ "$img_ext" != "png" ]] && [[ "$img_ext" != "jpg" ]]; then
 				magick "$save_location/$name.$img_ext" "$save_location/$name.png"
