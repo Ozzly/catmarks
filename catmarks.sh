@@ -39,7 +39,7 @@ image_downloader(){
 			archive_url=$(echo "$response" | grep '^location:' | tail -c +11 | tr -d '\r')
 			webpage=$(curl "$archive_url")
 			
-			if [[ "$url" == *"etsy.co.uk"* || "$url" == *"etsy.com"* ]]; then
+			if [[ "$url" == *"etsy.com"* ]]; then
 				img_archive_src=$(echo "$webpage" | grep "main-product-image" | sed -n 's/.*data-src-zoom-image="\([^"]*\)".*/\1/p')
 				img_org_src=$(echo "$img_archive_src" | sed 's|https://web.archive.org/.*\(https://i.etsystatic.com/.*\)|\1|')
 				img_ext="${img_org_src##*.}"
@@ -86,7 +86,8 @@ while true; do
                 rofi_cmd+=(-show-icons -theme "$current_dir/rofi_theme.rasi")
         fi
 
-        # Generate the input to rofi (with thumbnails)
+
+        # Generate rofi input
         [[ "$rofi_new_bookmark_option" == 1 ]] && text_with_icons+="New Bookmark\0icon\x1f$base_dir/plus_icon.png\n"
 
 	for file in "$current_dir"/*; do
@@ -149,5 +150,8 @@ while true; do
 			xdg-open $(cat "$current_dir/$selection.txt")
 			break;
 		fi
-	fi
+	else
+                notify-send "Invalid exit code"
+                break;
+        fi
 done
