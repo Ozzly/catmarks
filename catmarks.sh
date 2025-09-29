@@ -55,7 +55,7 @@ image_downloader(){
 			# Download image
 			curl "$img_org_src" -o "$save_location/$name.$img_ext"
 			# Convert image format if needed	
-			if [[ "$img_ext" != "png" ]] && [[ "$img_ext" != "jpg" ]]; then
+			if [[ -n "$img_ext" ]] && [[ "$img_ext" != "png" ]] && [[ "$img_ext" != "jpg" ]]; then
 				magick "$save_location/$name.$img_ext" "$save_location/$name.png"
 			fi
 
