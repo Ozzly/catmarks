@@ -30,7 +30,6 @@ image_downloader(){
 		curl "i.ytimg.com/vi/$video_id/maxresdefault.jpg" -o "$save_location/$name.jpg"
 
 	else # Use the internet archive to bypass bot restrictions on websites
-                echo "waiting for response"
 		response=$(curl -sI "https://web.archive.org/save/$url")
 
 		response_status=$(echo "$response" | grep 'HTTP/2' | tail -c +8 | tr -d '\r')
@@ -38,7 +37,6 @@ image_downloader(){
 
 			# Obtain original image URL
 			archive_url=$(echo "$response" | grep '^location:' | tail -c +11 | tr -d '\r')
-                        echo "$archive_url"
 			webpage=$(curl "$archive_url")
 			
 			if [[ "$url" == *"etsy.com"* ]]; then
@@ -150,7 +148,7 @@ while true; do
 
 		else 
 			# Open bookmark in the default browser
-			xdg-open $(cat "$current_dir/$selection.txt")
+			xdg-open "$(cat "$current_dir/$selection.txt")"
 			break;
 		fi
 	else
