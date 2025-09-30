@@ -2,6 +2,8 @@
 
 *A category-based bookmark system powered by Rofi.*
 
+![Using Catmarks Gif](https://github.com/Ozzly/catmarks/blob/main/assets/catmarks_usage.gif)
+
 `catmarks` is a lightweight shell script that lets you organise and launch bookmarks through [Rofi](https://github.com/davatorium/rofi).  
 Bookmarks are grouped into **categories** (folders) and the script will attempt to download thumbnails for supported sites to give a visual picker in Rofi.
 
