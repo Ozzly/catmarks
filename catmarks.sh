@@ -91,7 +91,7 @@ while true; do
 
 
         # Generate rofi input
-        [[ "$rofi_new_bookmark_option" == 1 ]] && text_with_icons+="New Bookmark\0icon\x1f$base_dir/plus_icon.png\n"
+        [[ "$rofi_new_bookmark_option" -eq 1 ]] && text_with_icons+="New Bookmark\0icon\x1f$base_dir/plus_icon.png\n"
 
 	for file in "$current_dir"/*; do
 		[ -e "$file" ] || continue
@@ -108,7 +108,7 @@ while true; do
 		fi
 	done
 
-	[[ "$rofi_new_category_option" == 1 ]] && text_with_icons+="Create New Category\0icon\x1f$base_dir/add_directory.png"
+	[[ "$rofi_new_category_option" -eq 1 ]] && text_with_icons+="Create New Category\0icon\x1f$base_dir/add_directory.png"
 
 
 	# Display rofi prompt, get exit code for keybind responses
