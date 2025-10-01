@@ -74,4 +74,11 @@ Example layout:
 
 
 ## TODO
-This project is still in early days and has alot of work to come.
+
++ Search child directories for thumbnails for a parent
++ Update low quality gif
++ Command to add bookmarks and fetch images
++ Make search case insensitive
++ Update usage/installation with instructions to copy assets across
++ Optional Keybinds
+
