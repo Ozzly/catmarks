@@ -7,14 +7,16 @@ current_dir="$base_dir"
 auto_download_thumbnails=1
 rofi_new_bookmark_option=1
 rofi_new_category_option=1
+notifications=1
 
 while [[ $# -gt 0 ]]; do
         case $1 in
-                --base-directory | -b) base_dir="$2"; shift 2 ;;
+                --base-directory | -f) base_dir="$2"; shift 2 ;;
                 --disable-download-thumbnails | -d) auto_download_thumbnails=0; shift ;;
                 --custom-rofi-path | -r) custom_rofi_path="$2"; shift 2 ;;
-                --disable-rofi-new-bookmark-option | -n) rofi_new_bookmark_option=0; shift ;;
+                --disable-rofi-new-bookmark-option | -b) rofi_new_bookmark_option=0; shift ;;
                 --disable-rofi-new-category-option | -c) rofi_new_category_option=0; shift ;;
+                --disable-notifications | -n) notifications=0; shift ;;
         esac
 done
 
@@ -49,7 +51,7 @@ image_downloader(){
 				img_ext="${img_src##*.}"
 				
 			else
-				notify-send "Website not yet supported"
+				[[ "$notifications" -eq 1 ]] && notify-send "Website not yet supported"
 				break
 			fi
 			
@@ -61,7 +63,7 @@ image_downloader(){
 			fi
 
 		else # Failed to archive page
-			notify-send "Bad response from archive.org"
+			[[ "$notifications" -eq 1 ]] && notify-send "Bad response from archive.org"
 		fi
 
 	fi
@@ -127,7 +129,7 @@ while true; do
                                 [[ "$auto_download_thumbnails" -eq 1 ]] && image_downloader "$new_bookmark_url" "$new_bookmark_name" "$current_dir" &
 				echo "$new_bookmark_url" >> "$current_dir/$new_bookmark_name.txt"
 			else
-				notify-send "Input fields left blank"
+				[[ "$notifications" -eq 1 ]] && notify-send "Input fields left blank"
 			fi
 			break
 
@@ -139,7 +141,7 @@ while true; do
 				mkdir "$new_category_path"
 				current_dir="$new_category_path"
 			else
-				notify-send "Failed to create new category"
+				[[ "$notifications" -eq 1 ]] && notify-send "Failed to create new category"
 			fi
 
 		elif [ -d "$current_dir/$selection" ]; then
@@ -152,7 +154,7 @@ while true; do
 			break;
 		fi
 	else
-                notify-send "Invalid exit code"
+                [[ "$notifications" -eq 1 ]] && notify-send "Invalid exit code"
                 break;
         fi
 done
