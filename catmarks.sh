@@ -95,9 +95,14 @@ while true; do
 
 	for file in "$current_dir"/*; do
 		[ -e "$file" ] || continue
-		if [ -d "$file" ] || [[ "$file" == *.txt ]]; then
-			name_ext=$(basename "$file")
-			name="${name_ext%.*}"
+                name_ext=$(basename "$file")
+                name="${name_ext%.*}"
+
+		if [ -d "$file" ]; then
+                        child_image=$(find "$file" -maxdepth 2 -iregex ".*\.\(jpg\|png\)" -print -quit)
+                        [[ -e "$child_image" ]] && text_with_icons+="$name\0icon\x1fthumbnail://$child_image\n"
+
+                elif [[ "$file" == *.txt ]]; then # Bookmark
 			if [ -e "$current_dir/$name.png" ]; then  
 				text_with_icons+="$name\0icon\x1fthumbnail://$current_dir/$name.png\n" 
 			elif [ -e "$current_dir/$name.jpg" ]; then  
