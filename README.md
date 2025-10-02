@@ -75,10 +75,10 @@ Example layout:
 
 ## TODO
 
-+ Search child directories for thumbnails for a parent
-+ Update low quality gif
-+ Command to add bookmarks and fetch images
-+ Make search case insensitive
-+ Update usage/installation with instructions to copy assets across
-+ Optional Keybinds
+- [X] Search child directories for thumbnails for a parent
+- [ ] Update low quality gif
+- [ ] Command to add bookmarks and fetch images
+- [ ] Make search case insensitive
+- [ ] Update usage/installation with instructions to copy assets across
+- [ ] Optional Keybinds
 
